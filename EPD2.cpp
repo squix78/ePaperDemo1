@@ -545,6 +545,66 @@ void EPD_Class::frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stag
   }
 }
 
+void EPD_Class::frame_cb_13(uint8_t *buffer, EPD_stage stage) {
+  uint8_t lineBuffer[264 / 8]; // allows for 2.70" panel
+  int repeat;
+  int step;
+  int block;
+  if (EPD_inverse == stage) {  // stage 1
+    repeat = this->compensation->stage1_repeat;
+    step = this->compensation->stage1_step;
+    block = this->compensation->stage1_block;
+  } else {                     // stage 3
+    repeat = this->compensation->stage3_repeat;
+    step = this->compensation->stage3_step;
+    block = this->compensation->stage3_block;
+  }
+
+  int total_lines = this->lines_per_display;
+
+  for (int n = 0; n < repeat; ++n) {
+
+    int block_begin = 0;
+    int block_end = 0;
+
+    while (block_begin < total_lines) {
+
+      block_end += step;
+      block_begin = block_end - block;
+      if (block_begin < 0) {
+        block_begin = 0;
+      } else if (block_begin >= total_lines) {
+        break;
+      }
+
+      bool full_block = (block_end - block_begin == block);
+
+      for (int line = block_begin; line < block_end; ++line) {
+        if (line >= total_lines) {
+          break;
+        }
+        if (full_block && (line < (block_begin + step))) {
+          this->line(line, 0, 0x00, false, EPD_normal);
+        } else {
+          //reader(buffer, line * this->bytes_per_line, this->bytes_per_line);
+          for (int i = 0; i < this->bytes_per_line; i++) {
+            uint8_t currentByte = 0;
+            for (int j = 0; j < 8; j++) {
+              int x = i * 8 + j;
+              int y = line;
+              uint8_t sourceByte = buffer[x + y / 8 * this->dots_per_line];
+              if (bitRead(sourceByte, y & 7) == 1) {
+                currentByte |= (1 << (j & 7));
+              }
+            }
+            lineBuffer[i] = currentByte; //buffer[line * this->bytes_per_line + i];
+          }
+          this->line(line, lineBuffer, 0, false, stage);
+        }
+      }
+    }
+  }
+}
 
 void EPD_Class::frame_stage2() {
   for (uint16_t i = 0; i < this->compensation->stage2_repeat; ++i) {

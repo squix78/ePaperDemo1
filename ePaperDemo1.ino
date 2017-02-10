@@ -36,6 +36,7 @@
 // required libraries
 #include <SPI.h>
 #include "EPD2.h"
+#include "Display.h"
 #include "image.h"
 
 // Change this for different display size
@@ -96,25 +97,6 @@
 #define IMAGE_2_BITS MAKE_NAME(IMAGE_2,NAME_SUFFIX)
 
 
-// Add Images library to compiler path
-//#include <Images.h>  // this is just an empty file
-
-// images
-/*PROGMEM const
-#define unsigned
-#define char uint8_t
-#include IMAGE_1_FILE
-#undef char
-#undef unsigned
-
-PROGMEM const
-#define unsigned
-#define char uint8_t
-#include IMAGE_2_FILE
-#undef char
-#undef unsigned*/
-
-
 #if defined(__MSP430_CPU__)
 
 // TI LaunchPad IO layout
@@ -157,7 +139,7 @@ const int Pin_RED_LED = D8;//13;
 
 // define the E-Ink display
 EPD_Class EPD(EPD_SIZE, Pin_PANEL_ON, Pin_BORDER, Pin_DISCHARGE, Pin_RESET, Pin_BUSY, Pin_EPD_CS);
-
+Display display(&EPD);
 
 // I/O setup
 void setup() {
@@ -195,6 +177,7 @@ void setup() {
   Serial.println("Display: " MAKE_STRING(EPD_SIZE));
   Serial.println();
 
+  display.init();
   /*FLASH.begin(Pin_FLASH_CS);
   if (FLASH.available()) {
     Serial.println("FLASH chip detected OK");
@@ -215,7 +198,7 @@ void setup() {
 }
 
 
-static int state = 0;
+static int state = 2;
 
 
 // main loop
@@ -250,8 +233,19 @@ void loop() {
     break;
 
   case 2:         // second image
-    EPD.image(squix_bits);
-    ++state = 1;  // back to first image
+    display.clear();
+    //display.setPixel(10, 10);
+    display.setFont(ArialMT_Plain_24);
+    display.drawString(0, 30, "Hello world");
+    /*display.drawLine(0, 0, 0, 100);
+    display.drawLine(1, 0, 1, 100);
+    display.drawLine(0, 0, 264, 176);
+    for (int i = 0; i < 176; i++) {
+      display.setPixel(i, i);
+      display.setPixel(i+1, i);
+    }*/
+    display.display();
+    //++state = 1;  // back to first image
     break;
   }
   EPD.end();   // power down the EPD panel

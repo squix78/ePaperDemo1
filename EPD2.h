@@ -134,6 +134,16 @@ public:
     this->frame_data_13(image_data, EPD_normal, false);
   }
 
+  void display(uint8_t *buffer) {
+    this->frame_cb_13(buffer, EPD_inverse);
+    this->frame_stage2();
+    this->frame_cb_13(buffer, EPD_normal);  
+    //this->frame_data_13(buffer, EPD_inverse, false);
+    //this->frame_stage2();
+    //this->frame_data_13(buffer, EPD_normal, false);  
+  }
+  
+
 
   // Low level API calls
   // ===================
@@ -148,6 +158,7 @@ public:
   void frame_fixed_13(uint8_t fixed_value, EPD_stage stage);
   void frame_data_13(const uint8_t *image_data, EPD_stage stage, bool read_progmem = true);
   void frame_cb_13(uint32_t address, EPD_reader *reader, EPD_stage stage);
+  void frame_cb_13(uint8_t *buffer, EPD_stage stage);
 
   // single line display - very low-level
   // also has to handle AVR progmem
