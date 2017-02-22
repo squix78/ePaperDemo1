@@ -38,6 +38,7 @@
 #include "EPD2.h"
 #include "Display.h"
 #include "image.h"
+#include "MeteoconsFont.h"
 
 // Change this for different display size
 // supported sizes: 144 200 270
@@ -235,15 +236,13 @@ void loop() {
   case 2:         // second image
     display.clear();
     //display.setPixel(10, 10);
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
     display.setFont(ArialMT_Plain_24);
-    display.drawString(0, 30, "Hello world");
-    /*display.drawLine(0, 0, 0, 100);
-    display.drawLine(1, 0, 1, 100);
-    display.drawLine(0, 0, 264, 176);
-    for (int i = 0; i < 176; i++) {
-      display.setPixel(i, i);
-      display.setPixel(i+1, i);
-    }*/
+    display.drawString(264 / 2, 0, "Hello world");
+    display.drawString(264 / 2, 24, "ePaperDemo1");
+    display.setFont(Meteocons_Plain_42);
+    display.drawHorizontalLine(10, 64, 264 - 20);
+    display.drawString(264 / 2, 60, "AF");
     display.display();
     //++state = 1;  // back to first image
     break;
