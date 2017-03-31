@@ -24,7 +24,7 @@
  *
  * Credits for parts of this code go to Mike Rankin. Thank you so much for sharing!
  */
-
+ 
 #ifndef OLEDDISPLAY_h
 #define OLEDDISPLAY_h
 
